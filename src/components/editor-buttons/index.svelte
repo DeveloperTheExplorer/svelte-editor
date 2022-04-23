@@ -9,28 +9,33 @@
     import FaAlignCenter from 'svelte-icons/fa/FaAlignCenter.svelte';
     import FaAlignRight from 'svelte-icons/fa/FaAlignRight.svelte';
     import FaAlignJustify from 'svelte-icons/fa/FaAlignJustify.svelte';
+    import type { EditType } from '@/interface/editor';
+
+    export let handleButtonClick: (type: EditType) => void
+    
+    const handleClick = (type: EditType) => (_) => handleButtonClick(type)
 </script>
 
 <div class="buttons-container">
-    <button class="editor-button">
+    <button class="editor-button" on:click={handleClick('bold')}>
         <FaBold />
     </button>
-    <button class="editor-button">
+    <button class="editor-button" on:click={handleClick('italic')}>
         <FaItalic />
     </button>
     
     <span class="divider"></span>
 
-    <button class="editor-button">
+    <button class="editor-button" on:click={handleClick('justify-left')}>
         <FaAlignLeft />
     </button>
-    <button class="editor-button">
+    <button class="editor-button" on:click={handleClick('justify-center')}>
         <FaAlignCenter />
     </button>
-    <button class="editor-button">
+    <button class="editor-button" on:click={handleClick('justify-right')}>
         <FaAlignRight />
     </button>
-    <button class="editor-button">
+    <button class="editor-button" on:click={handleClick('justify')}>
         <FaAlignJustify />
     </button>
 </div>

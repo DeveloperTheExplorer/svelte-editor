@@ -1,0 +1,1 @@
+export type EditType = 'bold' | 'italic' | 'justify-left' | 'justify-center' | 'justify-right' | 'justify';
