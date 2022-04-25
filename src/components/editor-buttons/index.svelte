@@ -26,16 +26,16 @@
     
     <span class="divider"></span>
 
-    <button class="editor-button" on:click={handleClick('justify-left')}>
+    <button class="editor-button" on:click={handleClick('align-left')}>
         <FaAlignLeft />
     </button>
-    <button class="editor-button" on:click={handleClick('justify-center')}>
+    <button class="editor-button" on:click={handleClick('align-center')}>
         <FaAlignCenter />
     </button>
-    <button class="editor-button" on:click={handleClick('justify-right')}>
+    <button class="editor-button" on:click={handleClick('align-right')}>
         <FaAlignRight />
     </button>
-    <button class="editor-button" on:click={handleClick('justify')}>
+    <button class="editor-button" on:click={handleClick('align-justify')}>
         <FaAlignJustify />
     </button>
 </div>

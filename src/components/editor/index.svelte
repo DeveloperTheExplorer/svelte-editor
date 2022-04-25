@@ -1,18 +1,53 @@
-<style type='text/sass'>
-	@import './styles.sass'
+<style type='text/sass' global>
+@import './styles.sass'
+
+:global(.bold)
+    font-weight: bold
+
+:global(.italic)
+    font-style: italic
+
+:global(.align-left)
+    text-align: left
+
+:global(.align-center)
+    text-align: center
+
+:global(.align-right)
+    text-align: right
+
+:global(.align-justify)
+    text-align: justify
 </style>
 
 <script lang="ts">
     import type { EditType } from '../../interface/editor';
     import EditorButtons from '../editor-buttons/index.svelte'
     export let value: string;
+    
+    const handleParentNodeStyling = (parentElement: HTMLElement, type: EditType) => {
+        const { classList } = parentElement;
 
-    const editTypeMapping = {
-        bold: ['<strong>', '</strong>'],
-        italic: ['<em>', '</em>'],
-        'justify-left': ['<span style="text-align: left">', '</span>'],
-        'justify-center': ['<span style="text-align: center">', '</span>'],
-        justify: ['<span style="text-align: justify">', '</span>'],
+        if (classList.contains(type)) {
+            classList.remove(type);
+
+            return;
+        }
+
+        if (type.includes('align')) {
+            if (parentElement.tagName === 'SPAN') {
+                return handleParentNodeStyling(parentElement.parentElement, type);
+            }
+            classList.forEach(
+                (className) => {
+                    if (className.includes('align')) {
+                        classList.remove(className);
+                    }
+                }
+            )
+        }
+
+        classList.add(type); 
     }
 
     const handleButtonClick = (type: EditType) => {
@@ -22,22 +57,29 @@
             return;
         }
 
-        const styling = editTypeMapping[type];
-        const textStart = selection.anchorOffset;
-        const textEnd = selection.focusOffset;
-        const selectedParagraph = selection.focusNode.data;
-        const selectedText = selectedParagraph.substring(textStart, textEnd);
-        const selectedSplit = value.split(selectedParagraph);
-        const paragraphStart = selectedParagraph.substring(0, textStart);
-        const paragraphEnd = selectedParagraph.substring(textEnd);
-        const editedText = styling[0] + selectedText + styling[1];
-        const editedParagraph = paragraphStart + editedText + paragraphEnd;
-        const finalHTML = selectedSplit[0] + editedParagraph + selectedSplit[1];
+        const { anchorNode, anchorOffset, focusOffset } = selection;
+        const { textContent } = anchorNode;
+        const parentElement = anchorNode.parentElement;
+        const selectedText = textContent.substring(anchorOffset, focusOffset);
+        const isParentNode = selectedText.length === 0 
+            || type.includes('align') 
+            || selectedText === parentElement.innerText;
 
-        console.log('check: text', window.getSelection());
-        console.log('check: text', selectedSplit);
-        console.log('check: selectedText', selectedText)
-        value = finalHTML;
+        console.log('check: selection', selection);
+        console.log('check: isParentNode', isParentNode);
+        console.log('check: selectedText', selectedText);
+
+        if (isParentNode) {
+            handleParentNodeStyling(parentElement, type);
+
+            return;
+        }
+        
+        const contentSplit = parentElement.innerHTML.split(selectedText);
+        const newElement = `<span class="${type}">${selectedText}</span>`;
+        const editedContent = contentSplit[0] + newElement + contentSplit[1];
+
+        parentElement.innerHTML = editedContent;
     }
     
 </script>
@@ -46,7 +88,6 @@
     <div class="editor-controller">
         <EditorButtons handleButtonClick={handleButtonClick} />
     </div>
-    <div class="editor-main" contenteditable="true">
-        {@html value}
-    </div>
+    <div class="editor-main" contenteditable="true" bind:innerHTML={value}></div>
+    <span class="italic">wtf</span>
 </div>
